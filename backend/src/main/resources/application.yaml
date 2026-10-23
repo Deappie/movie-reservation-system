@@ -1,0 +1,22 @@
+spring:
+    application:
+        name: backend
+    r2dbc:
+        url: r2dbc:postgresql://localhost:5432/movie_reservation
+        username: ${DB_USER:admin}
+        password: ${DB_PASSWORD:password}
+    flyway:
+        url: jdbc:postgresql://localhost:5432/movie_reservation
+        user: ${DB_USER:admin}
+        password: ${DB_PASSWORD:password}
+    webflux:
+        problemdetails:
+            enabled: true
+
+app:
+    jwt:
+        secret: ${JWT_SECRET:v5No9AjqAp6FnimStniecaKlPkFrND6YSf9E8XDgSTg=}
+        ttl: 1h
+    admin:
+        email: ${ADMIN_EMAIL:admin@movies.local}
+        password: ${ADMIN_PASSWORD:password}
