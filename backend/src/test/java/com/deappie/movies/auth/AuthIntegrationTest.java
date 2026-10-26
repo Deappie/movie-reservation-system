@@ -2,72 +2,22 @@ package com.deappie.movies.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.deappie.movies.TestcontainersConfiguration;
+import com.deappie.movies.IntegrationTest;
 import com.deappie.movies.user.UserResponse;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
-@Import(TestcontainersConfiguration.class)
-@AutoConfigureWebTestClient
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-            "app.admin.email=" + AuthIntegrationTest.ADMIN_EMAIL,
-            "app.admin.password=" + AuthIntegrationTest.ADMIN_PASSWORD
-        })
-class AuthIntegrationTest {
-
-    static final String ADMIN_EMAIL = "admin@test.local";
-    static final String ADMIN_PASSWORD = "admin-password";
-
-    @Autowired
-    WebTestClient client;
-
-    // -- helpers --
-
-    private static String uniqueEmail() {
-        return "user-" + UUID.randomUUID() + "@test.local";
-    }
-
-    private void signup(String email, String password) {
-        client.post()
-                .uri("/api/auth/signup")
-                .bodyValue(new SignupRequest(email, password))
-                .exchange()
-                .expectStatus()
-                .isCreated();
-    }
-
-    private String login(String email, String password) {
-        LoginResponse response = client.post()
-                .uri("/api/auth/login")
-                .bodyValue(new LoginRequest(email, password))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(LoginResponse.class)
-                .returnResult()
-                .getResponseBody();
-        return Objects.requireNonNull(response).token();
-    }
-
-    // -- tests --
+class AuthIntegrationTest extends IntegrationTest {
 
     @Test
     void signupCreatesUserWithNormalizedEmail() {
         String email = uniqueEmail();
         client.post()
                 .uri("/api/auth/signup")
-                .bodyValue(new SignupRequest(email.toUpperCase(Locale.ROOT), "supersecret"))
+                .bodyValue(new SignupRequest(email.toUpperCase(Locale.ROOT), USER_PASSWORD))
                 .exchange()
                 .expectStatus()
                 .isCreated()
@@ -88,7 +38,7 @@ class AuthIntegrationTest {
     @Test
     void duplicateSignupReturns409() {
         String email = uniqueEmail();
-        signup(email, "supersecret");
+        signup(email, USER_PASSWORD);
 
         client.post()
                 .uri("/api/auth/signup")
@@ -116,9 +66,9 @@ class AuthIntegrationTest {
     @Test
     void loginReturnsToken() {
         String email = uniqueEmail();
-        signup(email, "supersecret");
+        signup(email, USER_PASSWORD);
 
-        String token = login(email, "supersecret");
+        String token = login(email, USER_PASSWORD);
 
         assertThat(token).isNotBlank();
     }
@@ -126,7 +76,7 @@ class AuthIntegrationTest {
     @Test
     void wrongPasswordAndUnknownEmailGiveSameError() {
         String email = uniqueEmail();
-        signup(email, "supersecret");
+        signup(email, USER_PASSWORD);
 
         client.post()
                 .uri("/api/auth/login")
@@ -140,7 +90,7 @@ class AuthIntegrationTest {
 
         client.post()
                 .uri("/api/auth/login")
-                .bodyValue(new LoginRequest(uniqueEmail(), "supersecret"))
+                .bodyValue(new LoginRequest(uniqueEmail(), USER_PASSWORD))
                 .exchange()
                 .expectStatus()
                 .isUnauthorized()
@@ -152,8 +102,8 @@ class AuthIntegrationTest {
     @Test
     void meReturnsCurrentUser() {
         String email = uniqueEmail();
-        signup(email, "supersecret");
-        String token = login(email, "supersecret");
+        signup(email, USER_PASSWORD);
+        String token = login(email, USER_PASSWORD);
 
         client.get()
                 .uri("/api/users/me")
@@ -170,9 +120,7 @@ class AuthIntegrationTest {
 
     @Test
     void userCannotAccessAdminEndpoints() {
-        String email = uniqueEmail();
-        signup(email, "supersecret");
-        String token = login(email, "supersecret");
+        String token = userToken();
 
         client.get()
                 .uri("/api/admin/users")
@@ -184,7 +132,7 @@ class AuthIntegrationTest {
 
     @Test
     void adminCanListUsers() {
-        String adminToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        String adminToken = adminToken();
 
         client.get()
                 .uri("/api/admin/users")
@@ -199,10 +147,8 @@ class AuthIntegrationTest {
 
     @Test
     void adminCanPromoteAnotherUser() {
-        String email = uniqueEmail();
-        signup(email, "supersecret");
-        long userId = currentUser(login(email, "supersecret")).id();
-        String adminToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        long userId = currentUser(userToken()).id();
+        String adminToken = adminToken();
 
         client.patch()
                 .uri("/api/admin/users/{id}/role", userId)
@@ -218,7 +164,7 @@ class AuthIntegrationTest {
 
     @Test
     void adminCannotChangeOwnRole() {
-        String adminToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        String adminToken = adminToken();
         long adminId = currentUser(adminToken).id();
 
         client.patch()

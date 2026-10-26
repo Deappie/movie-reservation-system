@@ -12,6 +12,8 @@ spring:
     webflux:
         problemdetails:
             enabled: true
+        multipart:
+            max-disk-usage-per-part: 5MB
 
 app:
     jwt:
@@ -20,3 +22,5 @@ app:
     admin:
         email: ${ADMIN_EMAIL:admin@movies.local}
         password: ${ADMIN_PASSWORD:password}
+    posters:
+        dir: ${POSTERS_DIR:./data/posters}

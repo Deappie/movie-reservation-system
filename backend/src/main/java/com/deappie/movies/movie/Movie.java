@@ -19,4 +19,8 @@ public record Movie(
     public long requiredId() {
         return Objects.requireNonNull(id, "Movie has not been saved yet");
     }
+
+    public Movie withPosterUrl(String posterUrl) {
+        return new Movie(id, title, description, posterUrl, durationMin, createdAt);
+    }
 }
