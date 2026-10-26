@@ -20,14 +20,17 @@ import reactor.core.scheduler.Schedulers;
 
 @Service
 class AuthService {
-    private final UserRepository users;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
     private final JwtEncoder jwtEncoder;
 
     AuthService(
-            UserRepository users, PasswordEncoder passwordEncoder, JwtProperties jwtProperties, JwtEncoder jwtEncoder) {
-        this.users = users;
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtProperties jwtProperties,
+            JwtEncoder jwtEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProperties = jwtProperties;
         this.jwtEncoder = jwtEncoder;
@@ -35,21 +38,23 @@ class AuthService {
 
     Mono<UserResponse> signup(SignupRequest req) {
         String email = User.normalizeEmail(req.email());
-        return users.existsByEmail(email)
+        return userRepository
+                .existsByEmail(email)
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new ConflictException("Email already registered"));
                     }
                     return Mono.fromCallable(() -> passwordEncoder.encode(req.password()))
                             .subscribeOn(Schedulers.boundedElastic())
-                            .flatMap(hash -> users.save(new User(null, email, hash, Role.USER, null)));
+                            .flatMap(hash -> userRepository.save(new User(null, email, hash, Role.USER, null)));
                 })
                 .map(UserResponse::from);
     }
 
     Mono<LoginResponse> login(LoginRequest req) {
         String email = User.normalizeEmail(req.email());
-        return users.findByEmail(email)
+        return userRepository
+                .findByEmail(email)
                 .switchIfEmpty(Mono.error(() -> new UnauthorizedException("Invalid email or password")))
                 .flatMap(user -> Mono.fromCallable(() -> passwordEncoder.matches(req.password(), user.passwordHash()))
                         .subscribeOn(Schedulers.boundedElastic())

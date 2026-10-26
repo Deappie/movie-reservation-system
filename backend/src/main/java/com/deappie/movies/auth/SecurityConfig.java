@@ -45,6 +45,8 @@ class SecurityConfig {
                         .permitAll()
                         .pathMatchers("/api/admin/**")
                         .hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/movies/**")
+                        .permitAll()
                         .anyExchange()
                         .authenticated())
                 .oauth2ResourceServer(

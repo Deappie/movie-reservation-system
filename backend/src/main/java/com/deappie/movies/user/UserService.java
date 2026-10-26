@@ -12,31 +12,33 @@ import reactor.core.publisher.Mono;
 class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private final UserRepository users;
+    private final UserRepository userRepository;
 
-    UserService(UserRepository users) {
-        this.users = users;
+    UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     Flux<UserResponse> findAll() {
-        return users.findAll().map(UserResponse::from);
+        return userRepository.findAll().map(UserResponse::from);
     }
 
     Mono<UserResponse> changeRole(long actingAdminId, long targetUserId, Role newRole) {
         if (actingAdminId == targetUserId) {
             return Mono.error(() -> new BadRequestException("Admins cannot change their own role"));
         }
-        return users.findById(targetUserId)
+        return userRepository
+                .findById(targetUserId)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("User " + targetUserId + " not found")))
                 .map(user -> user.withRole(newRole))
-                .flatMap(users::save)
+                .flatMap(userRepository::save)
                 .doOnNext(saved -> log.info(
                         "Admin {} changed role of the user {} to {}", actingAdminId, saved.requiredId(), newRole))
                 .map(UserResponse::from);
     }
 
     Mono<UserResponse> findById(long id) {
-        return users.findById(id)
+        return userRepository
+                .findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("User " + id + " not found")))
                 .map(UserResponse::from);
     }

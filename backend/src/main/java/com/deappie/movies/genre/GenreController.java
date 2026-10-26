@@ -1,6 +1,5 @@
 package com.deappie.movies.genre;
 
-import com.deappie.movies.common.NotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,22 +10,19 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/genres")
 class GenreController {
-    private final GenreRepository repository;
+    private final GenreService genreService;
 
-    GenreController(GenreRepository repository) {
-        this.repository = repository;
+    GenreController(GenreService genreService) {
+        this.genreService = genreService;
     }
 
     @GetMapping
     Flux<GenreResponse> findAll() {
-        return repository.findAll().map(GenreResponse::from);
+        return genreService.findAll();
     }
 
     @GetMapping("/{id}")
-    Mono<GenreResponse> findById(@PathVariable Long id) {
-        return repository
-                .findById(id)
-                .map(GenreResponse::from)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("Genre " + id + " not found")));
+    Mono<GenreResponse> findById(@PathVariable long id) {
+        return genreService.findById(id);
     }
 }

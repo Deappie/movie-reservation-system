@@ -143,7 +143,7 @@ curl localhost:8080/api/users/me -H "Authorization: Bearer $TOKEN"
 - [x] Database schema with constraints against double-booking and overlapping showtimes
 - [x] Spring Boot WebFlux skeleton, Flyway, error handling, integration tests
 - [x] Signup, login with JWT, roles, admin seeding
-- [ ] Admin user management (list users, promote to admin)
+- [x] Admin user management (list users, promote to admin)
 - [ ] Movies and genres management, poster upload
 - [ ] Halls and showtime scheduling
 - [ ] Seat map, reservations and cancellation, plus a concurrency test
