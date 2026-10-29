@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -224,37 +223,6 @@ class MovieIntegrationTest extends IntegrationTest {
     }
 
     // --- helpers ---
-
-    /** Ids of the first n seeded genres, read from the API so the test never depends on id values. */
-    private List<Long> genreIds(int n) {
-        List<Map<String, Object>> genres = client.get()
-                .uri("/api/genres")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .returnResult()
-                .getResponseBody();
-        return Objects.requireNonNull(genres).stream()
-                .limit(n)
-                .map(genre -> ((Number) genre.get("id")).longValue())
-                .toList();
-    }
-
-    /** Creates a movie as admin and returns its id. */
-    private long createMovie(String title, List<Long> genreIds) {
-        Map<?, ?> movie = client.post()
-                .uri("/api/admin/movies")
-                .headers(h -> h.setBearerAuth(adminToken()))
-                .bodyValue(Map.of("title", title, "durationMin", 120, "genreIds", genreIds))
-                .exchange()
-                .expectStatus()
-                .isCreated()
-                .expectBody(Map.class)
-                .returnResult()
-                .getResponseBody();
-        return ((Number) Objects.requireNonNull(movie).get("id")).longValue();
-    }
 
     /** A multipart body with a tiny fake file declared as the given type. */
     private static MultiValueMap<String, HttpEntity<?>> posterUpload(MediaType type) {
