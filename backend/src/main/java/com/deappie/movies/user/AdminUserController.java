@@ -1,7 +1,7 @@
 package com.deappie.movies.user;
 
+import com.deappie.movies.auth.CurrentUser;
 import jakarta.validation.Valid;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -28,7 +28,7 @@ class AdminUserController {
     @PatchMapping("/{id}/role")
     Mono<UserResponse> changeRole(
             @PathVariable long id, @Valid @RequestBody ChangeRoleRequest req, @AuthenticationPrincipal Jwt jwt) {
-        long adminId = Long.parseLong(Objects.requireNonNull(jwt.getSubject()));
+        long adminId = CurrentUser.id(jwt);
         return userService.changeRole(adminId, id, req.role());
     }
 }

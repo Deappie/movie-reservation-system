@@ -1,6 +1,6 @@
 package com.deappie.movies.user;
 
-import java.util.Objects;
+import com.deappie.movies.auth.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,7 +17,7 @@ class UserController {
 
     @GetMapping("/me")
     Mono<UserResponse> me(@AuthenticationPrincipal Jwt jwt) {
-        long userId = Long.parseLong(Objects.requireNonNull(jwt.getSubject()));
+        long userId = CurrentUser.id(jwt);
         return userService.findById(userId);
     }
 }
