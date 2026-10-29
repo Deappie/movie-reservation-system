@@ -24,3 +24,6 @@ app:
         password: ${ADMIN_PASSWORD:password}
     posters:
         dir: ${POSTERS_DIR:./data/posters}
+    cinema:
+        zone: Europe/Riga
+        cleaning-buffer: 15m

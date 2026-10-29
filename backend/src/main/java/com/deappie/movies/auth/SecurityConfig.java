@@ -49,6 +49,8 @@ class SecurityConfig {
                         .permitAll()
                         .pathMatchers(HttpMethod.GET, "/posters/**")
                         .permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/showtimes/**")
+                        .permitAll()
                         .anyExchange()
                         .authenticated())
                 .oauth2ResourceServer(
