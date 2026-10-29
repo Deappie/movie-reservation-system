@@ -1,5 +1,6 @@
 package com.deappie.movies.showtime;
 
+import com.deappie.movies.common.BadRequestException;
 import com.deappie.movies.common.ConflictException;
 import com.deappie.movies.common.NotFoundException;
 import com.deappie.movies.hall.Hall;
@@ -23,7 +24,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class ShowtimeService {
+public class ShowtimeService {
     private static final String HALL_OVERLAP = "23P01";
 
     private final ShowtimeRepository showtimeRepository;
@@ -66,6 +67,12 @@ class ShowtimeService {
     private static boolean isHallOverlap(Throwable e) {
         return NestedExceptionUtils.getMostSpecificCause(e) instanceof R2dbcException r2dbc
                 && HALL_OVERLAP.equals(r2dbc.getSqlState());
+    }
+
+    public Mono<Showtime> getById(long id) {
+        return showtimeRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(() -> new BadRequestException("Unknown showtime " + id)));
     }
 
     Flux<MovieShowtimesResponse> findByDate(LocalDate date) {
