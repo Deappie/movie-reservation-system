@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.NestedExceptionUtils;
@@ -82,8 +81,10 @@ class ShowtimeService {
     private static MovieShowtimesResponse toMovieShowtimes(List<ShowtimeRow> rows) {
         ShowtimeRow first = rows.getFirst();
         List<ShowtimeSlot> slots = rows.stream()
-                .map(r -> new ShowtimeSlot(r.id(), r.hallId(), r.hallName(), r.startsAt(), r.endsAt(), r.basePrice(), r.seatsLeft()))
+                .map(r -> new ShowtimeSlot(
+                        r.id(), r.hallId(), r.hallName(), r.startsAt(), r.endsAt(), r.basePrice(), r.seatsLeft()))
                 .toList();
-        return new MovieShowtimesResponse(first.movieId(), first.title(), first.posterUrl(), first.durationMin(), slots);
+        return new MovieShowtimesResponse(
+                first.movieId(), first.title(), first.posterUrl(), first.durationMin(), slots);
     }
 }

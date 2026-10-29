@@ -1,9 +1,8 @@
 package com.deappie.movies.showtime;
 
-import org.jspecify.annotations.Nullable;
-
 import java.math.BigDecimal;
 import java.time.Instant;
+import org.jspecify.annotations.Nullable;
 
 record ShowtimeRow(
         long id,
@@ -16,6 +15,4 @@ record ShowtimeRow(
         int durationMin,
         long hallId,
         String hallName,
-        long seatsLeft
-) {
-}
+        long seatsLeft) {}

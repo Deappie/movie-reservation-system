@@ -1,14 +1,13 @@
 package com.deappie.movies.showtime;
 
 import io.r2dbc.spi.Readable;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
