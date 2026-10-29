@@ -1,5 +1,6 @@
 package com.deappie.movies.genre;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,12 +10,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/genres")
+@RequiredArgsConstructor
 class GenreController {
     private final GenreService genreService;
-
-    GenreController(GenreService genreService) {
-        this.genreService = genreService;
-    }
 
     @GetMapping
     Flux<GenreResponse> findAll() {

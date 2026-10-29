@@ -1,6 +1,7 @@
 package com.deappie.movies.movie;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -17,12 +18,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/admin/movies")
+@RequiredArgsConstructor
 class AdminMovieController {
     private final MovieService movieService;
-
-    AdminMovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

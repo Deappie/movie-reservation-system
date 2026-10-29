@@ -4,17 +4,15 @@ import com.deappie.movies.common.BadRequestException;
 import com.deappie.movies.common.NotFoundException;
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class GenreService {
     private final GenreRepository genreRepository;
-
-    GenreService(GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
-    }
 
     Flux<GenreResponse> findAll() {
         return genreRepository.findAll().map(GenreResponse::from);

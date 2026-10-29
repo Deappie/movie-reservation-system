@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@RequiredArgsConstructor
 class MovieQueryRepository {
     private static final String SELECT_WITH_GENRES = """
             SELECT m.id, m.title, m.description, m.poster_url, m.duration_min,
@@ -22,10 +24,6 @@ class MovieQueryRepository {
             """;
 
     private final DatabaseClient db;
-
-    MovieQueryRepository(DatabaseClient db) {
-        this.db = db;
-    }
 
     Flux<MovieGenreRow> findByIdWithGenres(long id) {
         return db.sql(SELECT_WITH_GENRES + " WHERE m.id = :id ORDER BY g.name")

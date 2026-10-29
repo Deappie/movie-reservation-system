@@ -2,6 +2,7 @@ package com.deappie.movies.auth;
 
 import com.deappie.movies.user.UserResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,12 +13,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 class AuthController {
     private final AuthService authService;
-
-    AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)

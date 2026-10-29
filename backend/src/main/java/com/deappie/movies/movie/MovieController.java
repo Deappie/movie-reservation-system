@@ -3,6 +3,7 @@ package com.deappie.movies.movie;
 import com.deappie.movies.common.PageResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +14,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/movies")
+@RequiredArgsConstructor
 class MovieController {
     private final MovieService movieService;
-
-    MovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
 
     @GetMapping
     Mono<PageResponse<MovieResponse>> findPage(

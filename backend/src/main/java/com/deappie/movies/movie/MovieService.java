@@ -1,5 +1,6 @@
 package com.deappie.movies.movie;
 
+import com.deappie.movies.common.BadRequestException;
 import com.deappie.movies.common.ConflictException;
 import com.deappie.movies.common.NotFoundException;
 import com.deappie.movies.common.PageResponse;
@@ -7,9 +8,9 @@ import com.deappie.movies.genre.GenreResponse;
 import com.deappie.movies.genre.GenreService;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
-class MovieService {
-    private static final Logger log = LoggerFactory.getLogger(MovieService.class);
-
+@RequiredArgsConstructor
+@Slf4j
+public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieGenreRepository movieGenreRepository;
     private final MovieQueryRepository movieQueryRepository;
@@ -27,19 +28,6 @@ class MovieService {
     private final GenreService genreService;
 
     private final PosterStorage posterStorage;
-
-    MovieService(
-            MovieRepository movieRepository,
-            MovieGenreRepository movieGenreRepository,
-            MovieQueryRepository movieQueryRepository,
-            GenreService genreService,
-            PosterStorage posterStorage) {
-        this.movieRepository = movieRepository;
-        this.movieGenreRepository = movieGenreRepository;
-        this.movieQueryRepository = movieQueryRepository;
-        this.genreService = genreService;
-        this.posterStorage = posterStorage;
-    }
 
     @Transactional
     Mono<MovieResponse> create(MovieRequest req) {
@@ -131,6 +119,13 @@ class MovieService {
                 .filter(rows -> !rows.isEmpty())
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Movie " + id + " not found")))
                 .map(MovieService::toResponse);
+    }
+
+    /** For other features: loads the movie referenced in a request; unknown id → 400. */
+    public Mono<Movie> getById(long id) {
+        return movieRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(() -> new BadRequestException("Unknown movie " + id)));
     }
 
     private static MovieResponse toResponse(List<MovieGenreRow> rows) {

@@ -8,6 +8,7 @@ import com.deappie.movies.user.UserRepository;
 import com.deappie.movies.user.UserResponse;
 import java.time.Instant;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -19,22 +20,12 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
+@RequiredArgsConstructor
 class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
     private final JwtEncoder jwtEncoder;
-
-    AuthService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtProperties jwtProperties,
-            JwtEncoder jwtEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtProperties = jwtProperties;
-        this.jwtEncoder = jwtEncoder;
-    }
 
     Mono<UserResponse> signup(SignupRequest req) {
         String email = User.normalizeEmail(req.email());

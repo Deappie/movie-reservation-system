@@ -1,6 +1,7 @@
 package com.deappie.movies.user;
 
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +11,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 class UserController {
     private final UserService userService;
-
-    UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/me")
     Mono<UserResponse> me(@AuthenticationPrincipal Jwt jwt) {

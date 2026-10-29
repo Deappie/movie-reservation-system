@@ -2,21 +2,17 @@ package com.deappie.movies.user;
 
 import com.deappie.movies.common.BadRequestException;
 import com.deappie.movies.common.NotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 class UserService {
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
-
-    UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     Flux<UserResponse> findAll() {
         return userRepository.findAll().map(UserResponse::from);

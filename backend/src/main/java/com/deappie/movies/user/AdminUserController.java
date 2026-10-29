@@ -2,6 +2,7 @@ package com.deappie.movies.user;
 
 import jakarta.validation.Valid;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +16,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/admin/users")
+@RequiredArgsConstructor
 class AdminUserController {
     private final UserService userService;
-
-    AdminUserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     Flux<UserResponse> findAll() {
